@@ -4,27 +4,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Jev × RemotionUI</title>
 <style>
-  :root { color-scheme: dark; }
-  body { margin:0; font-family: system-ui; background:#07070b; color:#F4F1EA; }
-  .wrap { max-width:1180px; margin:0 auto; padding:28px 20px; }
-  textarea { width:100%; min-height:110px; background:#10131b; color:#fff; border:1px solid #222636; border-radius:14px; padding:14px; }
-  button { margin-top:12px; background:#7C9CFF; border:0; border-radius:999px; padding:11px 18px; font-weight:700; cursor:pointer; }
-  .clock { font-size:42px; margin:10px 0; }
-  .chip { display:inline-block; border:1px solid #222636; padding:5px 10px; border-radius:999px; margin:4px 4px 0 0; font-size:12px; }
-  iframe { width:100%; min-height:320px; border:1px solid #222636; border-radius:16px; background:#0b1020; }
-  pre { white-space:pre-wrap; background:#10131b; padding:12px; border-radius:12px; max-height:280px; overflow:auto; }
-  a { color:#7C9CFF; }
+  body{margin:0;font-family:system-ui;background:#07070b;color:#F4F1EA}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 20px}
+  textarea{width:100%;min-height:110px;background:#10131b;color:#fff;border:1px solid #222636;border-radius:14px;padding:14px}
+  button{margin-top:12px;background:#7C9CFF;border:0;border-radius:999px;padding:11px 18px;font-weight:700;cursor:pointer}
+  .clock{font-size:42px;margin:10px 0}
+  .chip{display:inline-block;border:1px solid #222636;padding:5px 10px;border-radius:999px;margin:4px 4px 0 0;font-size:12px}
+  iframe{width:100%;min-height:320px;border:1px solid #222636;border-radius:16px;background:#0b1020}
+  pre{white-space:pre-wrap;background:#10131b;padding:12px;border-radius:12px;max-height:280px;overflow:auto}
+  a{color:#7C9CFF}
 </style>
 <div class="wrap">
   <h1>Jev × RemotionUI</h1>
-  <p>Catalog is <a href="https://remotionui.com/docs/components/browse">remotionui.com/docs/components/browse</a>. Jev picks composition, background, text fx, enter, scenes, and transition slugs.</p>
-  <textarea id="prompt">15-second dark tech launch for Jev Cut: punchy stacked beats, terminal then steps, end on a CTA.</textarea>
+  <p>No storyboard. Jev only explores <a href="https://remotionui.com/docs/components/browse">the catalogue</a> plus length. A cheap LLM fills the strings.</p>
+  <textarea id="prompt">15 seconds. Dark launch for Jev Cut. Terminal energy.</textarea>
   <button id="go">Generate cut</button>
   <div class="clock" id="clock">0.000s</div>
   <div id="metrics"></div>
   <div id="picks"></div>
   <iframe id="frame" title="preview"></iframe>
-  <pre id="code">RemotionUI TSX lands here.</pre>
+  <pre id="code"></pre>
 </div>
 <script>
   const go=document.getElementById('go'),prompt=document.getElementById('prompt'),frame=document.getElementById('frame'),clock=document.getElementById('clock'),metrics=document.getElementById('metrics'),picks=document.getElementById('picks'),code=document.getElementById('code');
@@ -38,11 +37,10 @@
       if(!res.ok) throw new Error(spec.error||res.statusText);
       cancelAnimationFrame(raf);
       clock.textContent=((spec.timing?.totalMs??performance.now()-t0)/1000).toFixed(3)+'s';
-      metrics.innerHTML=['Jev '+spec.timing?.jevMs+'ms','assemble '+spec.timing?.assembleMs+'ms','model '+spec.meta?.model].map(t=>'<span class=chip>'+t+'</span>').join('');
-      const j=spec.jev||{};
-      picks.innerHTML=['composition','background','text_fx','enter','scene_0','scene_1','scene_2','scene_3','transition'].map(k=>'<span class=chip>'+k+' '+(j[k]?.choice||'-')+'</span>').join('');
+      metrics.innerHTML=['Jev '+(spec.timing?.jevMs??'—')+'ms','copy '+(spec.timing?.copyMs??'—')+'ms','model '+(spec.meta?.model||''),'copy '+(spec.meta?.copyModel||''),'len '+(spec.meta?.seconds||'')+'s'].map(t=>'<span class=chip>'+t+'</span>').join('');
+      picks.innerHTML=(spec.slugs||[]).map(s=>'<span class=chip>'+s+' — '+(spec.strings&&spec.strings[s]||'')+'</span>').join('');
       frame.srcdoc=spec.previewHtml||'';
-      code.textContent=spec.remotionTsx||JSON.stringify(spec.clips,null,2);
+      code.textContent=spec.remotionTsx||'';
     }catch(e){cancelAnimationFrame(raf);code.textContent=String(e.message||e)}
     finally{go.disabled=false}
   };
