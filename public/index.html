@@ -2,94 +2,48 @@
 <html lang="en">
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Jev × Remotion primitives</title>
+<title>Jev × RemotionUI</title>
 <style>
-  :root { color-scheme: dark; --ink:#F4F1EA; --muted:#8B93A7; --line:#222636; --accent:#7C9CFF; }
-  * { box-sizing: border-box; }
-  body { margin:0; font-family: ui-sans-serif, system-ui, sans-serif; background:#07070b; color:var(--ink); }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 72px; }
-  h1 { font-size: 28px; letter-spacing:-0.04em; margin:0 0 6px; }
-  .sub { color:var(--muted); margin:0 0 22px; max-width: 70ch; line-height:1.5; }
-  .row { display:grid; grid-template-columns: 1fr 1fr; gap:18px; }
-  @media (max-width: 900px) { .row { grid-template-columns: 1fr; } }
-  textarea { width:100%; min-height:110px; background:#10131b; color:#fff; border:1px solid var(--line);
-    border-radius:14px; padding:14px; font: inherit; resize:vertical; }
-  button { margin-top:12px; background:var(--accent); color:#0b1020; border:0; border-radius:999px;
-    padding:11px 18px; font-weight:750; cursor:pointer; }
-  button[disabled] { opacity:.55; cursor:wait; }
-  .clock { font-variant-numeric: tabular-nums; font-size: 42px; letter-spacing:-0.04em; margin: 10px 0 4px; }
-  .clock.run { color: var(--accent); }
-  .metrics, .picks { display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0 12px; }
-  .chip { font-size:12px; border:1px solid var(--line); padding:5px 10px; border-radius:999px; color:#c5c9d6; }
-  .chip.hot { border-color: var(--accent); color: var(--accent); }
-  iframe { width:100%; min-height: 360px; border:1px solid var(--line); border-radius:16px; background:#0b1020; }
-  pre { font: 12px ui-monospace, monospace; color:#b7bdd0; background:#10131b; border:1px solid var(--line);
-    border-radius:14px; padding:12px 14px; max-height: 280px; overflow:auto; white-space: pre-wrap; }
+  :root { color-scheme: dark; }
+  body { margin:0; font-family: system-ui; background:#07070b; color:#F4F1EA; }
+  .wrap { max-width:1180px; margin:0 auto; padding:28px 20px; }
+  textarea { width:100%; min-height:110px; background:#10131b; color:#fff; border:1px solid #222636; border-radius:14px; padding:14px; }
+  button { margin-top:12px; background:#7C9CFF; border:0; border-radius:999px; padding:11px 18px; font-weight:700; cursor:pointer; }
+  .clock { font-size:42px; margin:10px 0; }
+  .chip { display:inline-block; border:1px solid #222636; padding:5px 10px; border-radius:999px; margin:4px 4px 0 0; font-size:12px; }
+  iframe { width:100%; min-height:320px; border:1px solid #222636; border-radius:16px; background:#0b1020; }
+  pre { white-space:pre-wrap; background:#10131b; padding:12px; border-radius:12px; max-height:280px; overflow:auto; }
+  a { color:#7C9CFF; }
 </style>
-<body>
 <div class="wrap">
-  <h1>Jev chooses Remotion primitives</h1>
-  <p class="sub">No TitleCard catalog. Jev answers choice/score/noul over AbsoluteFill, Sequence, Series, Loop, Freeze, Img, OffthreadVideo, Audio, spring, interpolate. Code emits the composition.</p>
-  <textarea id="prompt">15-second dark tech launch for Jev Cut: type a prompt, Jev picks Remotion primitives, code assembles Sequences. Cool, punchy, stacked beats.</textarea>
+  <h1>Jev × RemotionUI</h1>
+  <p>Catalog is <a href="https://remotionui.com/docs/components/browse">remotionui.com/docs/components/browse</a>. Jev picks composition, background, text fx, enter, scenes, and transition slugs.</p>
+  <textarea id="prompt">15-second dark tech launch for Jev Cut: punchy stacked beats, terminal then steps, end on a CTA.</textarea>
   <button id="go">Generate cut</button>
   <div class="clock" id="clock">0.000s</div>
-  <div class="metrics" id="metrics"></div>
-  <div class="picks" id="picks"></div>
-  <div class="row">
-    <iframe id="frame" title="preview"></iframe>
-    <pre id="code">Remotion TSX lands here.</pre>
-  </div>
+  <div id="metrics"></div>
+  <div id="picks"></div>
+  <iframe id="frame" title="preview"></iframe>
+  <pre id="code">RemotionUI TSX lands here.</pre>
 </div>
 <script>
-  const go = document.getElementById('go');
-  const prompt = document.getElementById('prompt');
-  const frame = document.getElementById('frame');
-  const clock = document.getElementById('clock');
-  const metrics = document.getElementById('metrics');
-  const picks = document.getElementById('picks');
-  const code = document.getElementById('code');
-  let raf = 0, t0 = 0;
-  function tick() {
-    clock.textContent = ((performance.now() - t0) / 1000).toFixed(3) + 's';
-    raf = requestAnimationFrame(tick);
-  }
-  go.onclick = async () => {
-    go.disabled = true;
-    clock.classList.add('run');
-    t0 = performance.now();
-    cancelAnimationFrame(raf);
-    tick();
-    try {
-      const res = await fetch('/api/plan', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt.value })
-      });
-      const spec = await res.json();
-      if (!res.ok) throw new Error(spec.error || res.statusText);
+  const go=document.getElementById('go'),prompt=document.getElementById('prompt'),frame=document.getElementById('frame'),clock=document.getElementById('clock'),metrics=document.getElementById('metrics'),picks=document.getElementById('picks'),code=document.getElementById('code');
+  let raf=0,t0=0;
+  function tick(){clock.textContent=((performance.now()-t0)/1000).toFixed(3)+'s';raf=requestAnimationFrame(tick)}
+  go.onclick=async()=>{
+    go.disabled=true;t0=performance.now();cancelAnimationFrame(raf);tick();
+    try{
+      const res=await fetch('/api/plan',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({prompt:prompt.value})});
+      const spec=await res.json();
+      if(!res.ok) throw new Error(spec.error||res.statusText);
       cancelAnimationFrame(raf);
-      const total = spec.timing?.totalMs ?? Math.round(performance.now() - t0);
-      clock.textContent = (total / 1000).toFixed(3) + 's';
-      clock.classList.remove('run');
-      metrics.innerHTML = [
-        ['Jev', spec.timing?.jevMs],
-        ['assemble', spec.timing?.assembleMs],
-        ['total', spec.timing?.totalMs],
-        ['model', spec.meta?.model],
-      ].map(([k,v], i) => '<span class="chip' + (i===2 ? ' hot' : '') + '">' + k + ' ' + (v ?? '—') + (typeof v === 'number' ? ' ms' : '') + '</span>').join('');
-      const j = spec.jev || {};
-      picks.innerHTML = ['format','layout','motion','layer_0','layer_1','layer_2'].map((k) =>
-        '<span class="chip">' + k + ' ' + (j[k]?.choice ?? '—') + '</span>'
-      ).join('');
-      frame.srcdoc = spec.previewHtml || '';
-      code.textContent = spec.remotionTsx || JSON.stringify(spec.tree, null, 2);
-    } catch (e) {
-      cancelAnimationFrame(raf);
-      clock.classList.remove('run');
-      code.textContent = String(e.message || e);
-    } finally {
-      go.disabled = false;
-    }
+      clock.textContent=((spec.timing?.totalMs??performance.now()-t0)/1000).toFixed(3)+'s';
+      metrics.innerHTML=['Jev '+spec.timing?.jevMs+'ms','assemble '+spec.timing?.assembleMs+'ms','model '+spec.meta?.model].map(t=>'<span class=chip>'+t+'</span>').join('');
+      const j=spec.jev||{};
+      picks.innerHTML=['composition','background','text_fx','enter','scene_0','scene_1','scene_2','scene_3','transition'].map(k=>'<span class=chip>'+k+' '+(j[k]?.choice||'-')+'</span>').join('');
+      frame.srcdoc=spec.previewHtml||'';
+      code.textContent=spec.remotionTsx||JSON.stringify(spec.clips,null,2);
+    }catch(e){cancelAnimationFrame(raf);code.textContent=String(e.message||e)}
+    finally{go.disabled=false}
   };
 </script>
-</body></html>
